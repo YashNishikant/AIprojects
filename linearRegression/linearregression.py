@@ -1,55 +1,70 @@
 import matplotlib.pyplot as plt
 import matplotlib.lines as lines
-import matplotlib.transforms as transforms
-
-x = []
-y = []
-
-m = 5
-b = 0
-x1 = 0
-x2 = 20
-linestart = [x1, x1*m+b]
-lineend = [x2, x2*m+b]
+import numpy as np
 fig, ax = plt.subplots()
-line = lines.Line2D([linestart[0],lineend[0]], [linestart[1],lineend[1]], color='red')
 
-points = [[0,3],[3,4],[6,5],[9,7],[13,8],[16,8],[19,10]]
+points = [[0,3],[3,9],[6,5],[9,7],[13,8*2],[16,8*2],[19,10*2]]
+#Given Points
 
-n = len(points)
+def node(points, typeFun):
+    
+    xP = []
+    for p in points:
+        xP.append(p[0])
 
-for p in points:
-    x.append(p[0])
-    y.append(p[1])
+    start_points = 0
+    end_points = max(xP)
 
-iter = 0
-pderivM = 0
-pderivB = 0
-epochs = 0
-L = 0.0001
-while epochs < 50000:
-    print(f'EPOCH: {epochs}')
+    iter = 1000
     pderivM = 0
     pderivB = 0
-    #MAJOR MISTAKE: I FORGOT TO RESET THE PARTIAL DERIVATIVES AFTER EACH ITERATION
+    epochs = 0
+    m = 1
+    b = 1
+    L = 0.0001
+
+    x = np.linspace(start_points, end_points, iter) 
+    y = None
+    
+    while epochs < 50000:
+        pderivM = 0
+        pderivB = 0
+        for p in points:
+            if typeFun == 'linear':
+                pderivM += 2*p[0]*((m*p[0]+b)-p[1])
+                pderivB += 2*((m*p[0]+b)-p[1])
+            elif typeFun == 'softplus':
+                pderivM += 2*p[0]*(m*np.log(1 + np.exp(p[0]))+b-p[1])
+                pderivB += 2*(m*np.log(1 + np.exp(p[0]))+b-p[1])
+
+        m-=L*pderivM
+        b-=L*pderivB
+        epochs+=1
+
+    if typeFun == 'linear':
+        y = m*x+b
+    elif typeFun == 'softplus':
+        y = m*np.log(1 + np.exp(x))+b
+
+    return [x,y]
+#Node Function
+
+def processPoints(points):
+    xP = []
+    yP = []
     for p in points:
-        pderivM += 2*p[0]*((m*p[0]+b)-p[1])
-        pderivB += 2*((m*p[0]+b)-p[1])
-    m-=L*pderivM
-    b-=L*pderivB
-    epochs+=1
+        xP.append(p[0])
+        yP.append(p[1])
+    return [xP, yP]
+#Obtaining points to graph
 
-linestart2 = [x1, x1*m+b]
-lineend2 = [x2, x2*m+b]
-line2 = lines.Line2D([linestart2[0],lineend2[0]], [linestart2[1],lineend2[1]], color='blue')
+xP, yP = processPoints(points)
+x, y = node(points, 'softplus')
+#Returns X and Y coordinate outputs to graph
 
-print(f'{linestart2[0]},  {linestart2[1]}')
-print(f'{lineend2[0]},  {lineend2[1]}')
-
-plt.xlim(0, 20)
-plt.ylim(0, 20)
+plt.xlim(0, max(xP))
+plt.ylim(0, max(yP)+10)
 plt.grid()
-plt.plot(x, y, 's')
-ax.add_line(line)
-ax.add_line(line2)
+plt.plot(xP, yP, 's')
+plt.plot(x,y)
 plt.show()
