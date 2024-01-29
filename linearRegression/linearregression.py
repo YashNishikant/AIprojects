@@ -6,7 +6,7 @@ fig, ax = plt.subplots()
 points = [[0,3],[3,9],[6,5],[9,7],[13,8*2],[16,8*2],[19,10*2]]
 #Given Points
 
-def node(points, typeFun):
+def regression(points, typeFun):
     
     xP = []
     for p in points:
@@ -59,7 +59,7 @@ def processPoints(points):
 #Obtaining points to graph
 
 xP, yP = processPoints(points)
-x, y = node(points, 'softplus')
+x, y = regression(points, 'softplus')
 #Returns X and Y coordinate outputs to graph
 
 plt.xlim(0, max(xP))
