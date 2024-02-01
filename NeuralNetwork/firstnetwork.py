@@ -1,13 +1,15 @@
 import matplotlib.pyplot as plt
 import matplotlib.lines as lines
 import numpy as np
+import pandas
+
 #hard code the network and optimize your parameters
 #next, make a node function that includes the function, weights and biases, and optimizes them inside
 def softplus(x):
     return np.log(1 + np.exp(x))
 def sigmoid(x):
     return np.exp(x)/(1+np.exp(x))
-def processPoints(points):
+def processPoints(points): #SCALE
     xP = []
     yP = []
     for p in points:
@@ -29,9 +31,8 @@ def model(points):
         predictArr = []
         for p in points:       #GENERATING NEW PREDICTIONS EACH EPOCH TO CALCULATE AND MINIMIZE ERROR THROUGH DERIVATIVES
             inpInit = p[0]
-            ans1=softplus(inpInit*w1+b1)*w3
-            ans2=softplus(inpInit*w2+b2)*w4+b3
-            predictArr.append(ans1+ans2)
+            predictArr.append(softplus(inpInit*w1+b1)*w3+softplus(inpInit*w2+b2)*w4+b3)
+            
         dw1 = 0                 #RESET ALL DERIVATIVES
         dw2 = 0
         dw3 = 0
