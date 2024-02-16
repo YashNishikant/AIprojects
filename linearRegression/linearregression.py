@@ -5,7 +5,6 @@ fig, ax = plt.subplots()
 
 points = [[0,3],[3,9],[6,5],[9,7],[13,8*2],[16,8*2],[19,10*2]]
 #Given Points
-
 def regression(points, typeFun):
     
     xP = []
@@ -25,8 +24,8 @@ def regression(points, typeFun):
 
     x = np.linspace(start_points, end_points, iter) 
     y = None
-    
-    while epochs < 50000:
+    collection = []
+    while epochs < 50000 and not derivCheck(collection, 0.0001):
         pderivM = 0
         pderivB = 0
         for p in points:
@@ -41,14 +40,17 @@ def regression(points, typeFun):
         b-=L*pderivB
         epochs+=1
 
+        collection = [L*pderivM, L*pderivB]
+
+        print(f'Iteration: {epochs} / MAX: 50000')
+
     if typeFun == 'linear':
         y = m*x+b
     elif typeFun == 'softplus':
         y = m*np.log(1 + np.exp(x))+b
-
+    
     return [x,y]
-#Node Function
-
+#LinReg
 def processPoints(points):
     xP = []
     yP = []
@@ -57,9 +59,17 @@ def processPoints(points):
         yP.append(p[1])
     return [xP, yP]
 #Obtaining points to graph
+def derivCheck(weightsbiases, derivMin):
+    if weightsbiases == []:
+        return False
+    for wb in weightsbiases:
+        if(wb > derivMin):
+            return False
+    return True
+#Derivative threshold check
 
 xP, yP = processPoints(points)
-x, y = regression(points, 'softplus')
+x, y = regression(points, 'linear')
 #Returns X and Y coordinate outputs to graph
 
 plt.xlim(0, max(xP))
